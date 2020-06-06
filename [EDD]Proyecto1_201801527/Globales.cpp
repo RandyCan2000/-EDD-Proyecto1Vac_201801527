@@ -9,7 +9,6 @@ NM InicioMatriz = NULL;
 bool Admin = false;
 NM UserLog = NULL;
 
-
 std::string ToUpperCase(std::string Texto) {
     int i = 0;
     char c;

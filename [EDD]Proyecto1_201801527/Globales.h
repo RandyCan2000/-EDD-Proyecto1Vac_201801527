@@ -9,6 +9,7 @@
 	extern NM InicioMatriz;
 	extern NM UserLog;
 	extern bool Admin;
+
 	std::string ToUpperCase(std::string Texto);
 	void gotoxy(int x, int y);
 	bool EsUnNumero(std::string Texto);

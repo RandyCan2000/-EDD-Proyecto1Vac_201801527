@@ -24,6 +24,7 @@ public:
 	NodoMatriz(std::string Nombre,bool D_E);
 	NodoMatriz();
 	void BuscarNodo(std::string Usuario, std::string Contrasena, std::string Departamento, std::string Empresa);
-	bool AgregarNodo(std::string Usuario, std::string Contrasena, std::string Departamento, std::string Empresa) {}
+	bool AgregarNodo(std::string Usuario, std::string Contrasena, std::string Departamento, std::string Empresa);
+	std::string ImprimirMatriz();
 };
 typedef class NodoMatriz *NM;
