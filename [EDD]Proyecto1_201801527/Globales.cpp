@@ -5,9 +5,12 @@
 
 
 int IndexUsuarios = 1;
+int IndexActivos = 1;
 NM InicioMatriz = NULL;
 bool Admin = false;
 NM UserLog = NULL;
+std::string EstrucArbol = "";
+int NNodoARBOl = 0;
 
 std::string ToUpperCase(std::string Texto) {
     int i = 0;

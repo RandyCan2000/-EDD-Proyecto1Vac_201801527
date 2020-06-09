@@ -1,8 +1,8 @@
+#include "NodoAVL.h"
 #include "NodoMatriz.h"
 #include "Globales.h"
 #include <iostream>
 #include <string>
-#include <string.h>
 
 NodoMatriz::NodoMatriz(std::string Usuario, std::string Contrasena, std::string Departamento, std::string Empresa) {
 	this->Index = IndexUsuarios;
@@ -18,6 +18,8 @@ NodoMatriz::NodoMatriz(std::string Usuario, std::string Contrasena, std::string 
 	this->Atras = NULL;
 	this->Cabecera = false;
 	this->ID = "algo";
+	//activos
+	this->Activos = NULL;
 	IndexUsuarios++;
 }
 NodoMatriz::NodoMatriz(std::string Nombre, bool D_E) {
@@ -29,6 +31,9 @@ NodoMatriz::NodoMatriz(std::string Nombre, bool D_E) {
 		this->Empresa = Nombre;
 		this->Departamento = "";
 	}
+	//activo
+	this->Activos = NULL;
+	//fin activo
 	this->Cabecera = true;
 	this->Abajo = NULL;
 	this->Arriba = NULL;
@@ -216,6 +221,7 @@ bool NodoMatriz::AgregarNodo(std::string Usuario, std::string Contrasena, std::s
 			Emp = Emp->Derecha;
 		}
 	}
+	return false;
 }
 
 
