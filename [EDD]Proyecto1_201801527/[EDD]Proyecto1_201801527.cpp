@@ -129,6 +129,7 @@ void FormularioAgregarActivo() {
 	if (ToUpperCase(N) != "" && ToUpperCase(D) != "") {
 		NAVL AVL = new NodoAVL(); 
 		bool Agregado=AVL->NuevoNodoAVL(ToUpperCase(Nombre), ToUpperCase(Descripcion));
+		AVL->CalcularAlturas(*UserLog->Activos);
 		if (Agregado == true) {
 			gotoxy(30, 15); SetColor(2);
 			cout << "ACTIVO AGREGADO CON EXITO";
@@ -159,7 +160,7 @@ void MenuUser() {
 		gotoxy(30, 9);
 		cout << "2. ELIMINAR ACTIVO";
 		gotoxy(30, 11);
-		cout << "3. MODIFICAR ACTIVO/CalAlturas";
+		cout << "3. MODIFICAR ACTIVO";
 		gotoxy(30, 13);
 		cout << "4. RENTAR ACTIVO";
 		gotoxy(30, 15);
@@ -175,7 +176,7 @@ void MenuUser() {
 			string val = Opcion;
 			if (val == "1") { FormularioAgregarActivo(); }
 			else if (val == "2") { cout << UserLog->Activos->Nombre; getchar(); }
-			else if (val == "3") { NAVL N = new NodoAVL(); N->CalcularAlturas(*UserLog->Activos); }
+			else if (val == "3") {}
 			else if (val == "4") {}
 			else if (val == "5") {
 				if (UserLog->Activos!=NULL) {

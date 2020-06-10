@@ -21,12 +21,8 @@ NodoAVL::NodoAVL(std::string Nombre, std::string Descripcion) {
 NodoAVL::NodoAVL() {
 }
 bool Aumento = false;
-int AltD = 0;
-int AltI = 0;
-int AlturaIzq(NodoAVL& Nodo);
-int AlturaDer(NodoAVL& Nodo);
 
-int AlturaDer(NodoAVL& Nodo) {
+int CalAltura(NodoAVL& Nodo) {
 	NAVL Aux = &Nodo;
 	if (Aux->Derecha == NULL && Aux->Izquierda == NULL) {
 		return 0;
@@ -34,34 +30,24 @@ int AlturaDer(NodoAVL& Nodo) {
 	else {
 		if (Aux->Derecha != NULL) {
 			Aux->Derecha->Altura = 0;
-			int A = AlturaDer(*Aux->Derecha) + 1;
+			int A = CalAltura(*Aux->Derecha) + 1;
 			Aux->Altura += A;
+			if (Aux->Izquierda != NULL) {
+				Aux->Izquierda->Altura = 0;
+				int A = CalAltura(*Aux->Izquierda) + 1;
+				Aux->Altura -= A;
+			}
 			return A;
 		}
 		if (Aux->Izquierda != NULL) {
 			Aux->Izquierda->Altura = 0;
-			int A = AlturaIzq(*Aux->Izquierda) + 1;
+			int A = CalAltura(*Aux->Izquierda) + 1;
 			Aux->Altura -= A;
-			return A;
-		}
-	}
-}
-int AlturaIzq(NodoAVL& Nodo) {
-	NAVL Aux = &Nodo;
-	if (Aux->Derecha==NULL && Aux->Izquierda == NULL) {
-		return 0;
-	}
-	else {
-		if (Aux->Derecha!=NULL) {
-			Aux->Derecha->Altura = 0;
-			int A = AlturaDer(*Aux->Derecha)+1;
-			Aux->Altura += A;
-			return A;
-		}
-		if (Aux->Izquierda != NULL) {
-			Aux->Izquierda->Altura = 0;
-			int A = AlturaIzq(*Aux->Izquierda) + 1;
-			Aux->Altura -= A;
+			if (Aux->Derecha != NULL) {
+				Aux->Derecha->Altura = 0;
+				int A = CalAltura(*Aux->Derecha) + 1;
+				Aux->Altura += A;
+			}
 			return A;
 		}
 	}
@@ -76,12 +62,12 @@ void NodoAVL::CalcularAlturas(NodoAVL &Nodo) {
 	else {
 		if (Aux->Izquierda != NULL) {
 			Aux->Izquierda->Altura = 0;
-			int A = AlturaIzq(*Aux->Izquierda) + 1;
+			int A = CalAltura(*Aux->Izquierda) + 1;
 			Aux->Altura -= A;
 		}
 		if (Aux->Derecha != NULL) {
 			Aux->Derecha->Altura = 0;
-			int A = AlturaDer(*Aux->Derecha) + 1;
+			int A = CalAltura(*Aux->Derecha) + 1;
 			Aux->Altura += A;
 		}
 	}
@@ -94,8 +80,23 @@ void RotacionDerecha(NodoAVL & P,NodoAVL &Q) {
 	AuxP->Nombre = NomQ, AuxP->Descripcion = DesQ;
 	AuxQ->Nombre = NomP, AuxQ->Descripcion = DesQ;
 	AuxP->Izquierda = AuxQ->Izquierda;
-	AuxQ->Izquierda = NULL;
+	AuxQ->Izquierda = AuxQ->Derecha;
+	AuxQ->Derecha = AuxP->Derecha;
 	AuxP->Derecha = AuxQ;
+	Aumento = false;
+}
+void RotacionIzquierda(NodoAVL& P, NodoAVL& Q) {
+	NAVL AuxP = &P, AuxQ = &Q;
+	std::string NomP = AuxP->Nombre, NomQ = AuxQ->Nombre;
+	std::string DesP = AuxP->Descripcion, DesQ = AuxQ->Descripcion;
+	AuxP->Nombre = NomQ; AuxP->Descripcion = DesQ;
+	AuxP->Derecha = AuxQ->Derecha;
+	AuxQ->Nombre = NomP; AuxQ->Descripcion = DesP;
+	AuxQ->Derecha = AuxQ->Izquierda;
+	AuxQ->Izquierda = AuxP->Izquierda;
+	AuxP->Izquierda = NULL;
+	AuxP->Izquierda = AuxQ;
+	Aumento = false;
 }
 
 void Rotacion(NodoAVL &Nodo) {
@@ -106,18 +107,29 @@ void Rotacion(NodoAVL &Nodo) {
 				if (Aux->Derecha->Altura==-1) {
 					RotacionDerecha(*Aux, *Aux->Derecha);
 				}
-				else if (Aux->Derecha->Altura == 1) {}
+				else if (Aux->Derecha->Altura == 1) {//Rotacion Doble a la Izquierda
+					RotacionIzquierda(*Aux->Derecha,*Aux->Derecha->Derecha);
+					RotacionDerecha(*Aux,*Aux->Derecha);
+				}
 			}
 			else {
-				if (Aux->Izquierda->Altura == -1) {}
-				else if (Aux->Izquierda->Altura == 1) {}
+				if (Aux->Izquierda->Altura == -1) {
+					RotacionDerecha(*Aux, *Aux->Izquierda);
+				}
+				else if (Aux->Izquierda->Altura == 1) {//Rotacion Doble a la izquierda
+					RotacionIzquierda(*Aux->Izquierda, *Aux->Izquierda->Derecha);
+					RotacionDerecha(*Aux, *Aux->Izquierda);
+				}
 			}
 		}
 		else if (Aux->Derecha!=NULL && Aux->Izquierda==NULL) {
 			if (Aux->Derecha->Altura == -1) {
 				RotacionDerecha(*Aux, *Aux->Derecha);
 			}
-			else if (Aux->Derecha->Altura == 1) {}
+			else if (Aux->Derecha->Altura == 1) {//Rotacion Doble a la izquierda
+				RotacionIzquierda(*Aux->Derecha, *Aux->Derecha->Derecha);
+				RotacionDerecha(*Aux, *Aux->Derecha);
+			}
 			else if (Aux->Derecha->Altura == 0) {
 				RotacionDerecha(*Aux, *Aux->Derecha);
 			}
@@ -126,7 +138,10 @@ void Rotacion(NodoAVL &Nodo) {
 			if (Aux->Izquierda->Altura == -1) {
 				RotacionDerecha(*Aux, *Aux->Izquierda);
 			}
-			else if (Aux->Izquierda->Altura == 1) {}
+			else if (Aux->Izquierda->Altura == 1) {//Rotacion Doble a la izquierda
+				RotacionIzquierda(*Aux->Izquierda, *Aux->Izquierda->Derecha);
+				RotacionDerecha(*Aux, *Aux->Izquierda);
+			}
 			else if (Aux->Izquierda->Altura == 0) {
 				RotacionDerecha(*Aux, *Aux->Izquierda);
 			}
@@ -135,27 +150,50 @@ void Rotacion(NodoAVL &Nodo) {
 	else if (Aux->Altura == 2) {
 		if (Aux->Derecha != NULL && Aux->Izquierda != NULL) {
 			if (abs(Aux->Derecha->Altura) > abs(Aux->Izquierda->Altura)) {
-				if (Aux->Derecha->Altura == -1) {
-					
+				if (Aux->Derecha->Altura == -1) {//Rotacion Doble a la derecha
+					RotacionDerecha(*Aux->Derecha, *Aux->Derecha->Izquierda);
+					RotacionIzquierda(*Aux, *Aux->Derecha);
 				}
-				else if (Aux->Derecha->Altura == 1) {}
-				else if (Aux->Derecha->Altura == 0) {}
+				else if (Aux->Derecha->Altura == 1) {
+					RotacionIzquierda(*Aux,*Aux->Derecha);
+				}
 			}
 			else {
-				if (Aux->Izquierda->Altura == -1) {}
-				else if (Aux->Izquierda->Altura == 1) {}
-				else if (Aux->Izquierda->Altura == 0) {}
+				if (Aux->Izquierda->Altura == -1) {//Rotacion Doble a la derecha
+					RotacionDerecha(*Aux->Izquierda, *Aux->Izquierda->Izquierda);
+					RotacionIzquierda(*Aux, *Aux->Izquierda);
+				}
+				else if (Aux->Izquierda->Altura == 1) {
+					RotacionIzquierda(*Aux, *Aux->Izquierda);
+				}
+				else if (Aux->Izquierda->Altura == 0) {
+					RotacionIzquierda(*Aux, *Aux->Izquierda);
+				}
 			}
 		}
 		else if (Aux->Derecha != NULL && Aux->Izquierda == NULL) {
-			if (Aux->Derecha->Altura == -1) {}
-			else if (Aux->Derecha->Altura == 1) {}
-			else if (Aux->Derecha->Altura == 0) {}
+			if (Aux->Derecha->Altura == -1) {//Rotacion Doble a la derecha
+				RotacionDerecha(*Aux->Derecha, *Aux->Derecha->Izquierda);
+				RotacionIzquierda(*Aux, *Aux->Derecha);
+			}
+			else if (Aux->Derecha->Altura == 1) {
+				RotacionIzquierda(*Aux, *Aux->Derecha);
+			}
+			else if (Aux->Derecha->Altura == 0) {
+				RotacionIzquierda(*Aux, *Aux->Derecha);
+			}
 		}
 		else if (Aux->Derecha == NULL && Aux->Izquierda != NULL) {
-			if (Aux->Izquierda->Altura == -1) {}
-			else if (Aux->Izquierda->Altura == 1) {}
-			else if (Aux->Izquierda->Altura == 0) {}
+			if (Aux->Izquierda->Altura == -1) {//Rotacion Doble a la derecha
+				RotacionDerecha(*Aux->Izquierda, *Aux->Izquierda->Izquierda);
+				RotacionIzquierda(*Aux, *Aux->Izquierda);
+			}
+			else if (Aux->Izquierda->Altura == 1) {
+				RotacionIzquierda(*Aux, *Aux->Izquierda);
+			}
+			else if (Aux->Izquierda->Altura == 0) {
+				RotacionIzquierda(*Aux, *Aux->Izquierda);
+			}
 		}
 	}
 }
@@ -165,14 +203,14 @@ bool Agregar(std::string Nombre, std::string Descripcion, NodoAVL& Nodo) {
 	if (strcmp(Nombre.c_str(), AUX->Nombre.c_str())==1) {
 		if (AUX->Derecha!=NULL) { 
 			bool agregado = Agregar(Nombre, Descripcion, *AUX->Derecha); 
-			//if (Aumento==true) {AUX->Altura++;}
-			//Rotacion(*AUX);
+			if (Aumento==true) {AUX->Altura++;}
+			Rotacion(*AUX);
 			return agregado;
 		}
 		else {
 			NAVL Nuevo = new NodoAVL(Nombre,Descripcion);
 			AUX->Derecha = Nuevo;
-			//AUX->Altura++;
+			AUX->Altura++;
 			if (AUX->Izquierda == NULL) { Aumento = true; }
 			return true;
 		}
@@ -180,14 +218,14 @@ bool Agregar(std::string Nombre, std::string Descripcion, NodoAVL& Nodo) {
 	else if (strcmp(Nombre.c_str(), AUX->Nombre.c_str()) == -1) {
 		if (AUX->Izquierda!=NULL) { 
 			bool agregado=Agregar(Nombre, Descripcion, *AUX->Izquierda); 
-			//if (Aumento == true) { AUX->Altura--; }
-			//Rotacion(*AUX);
+			if (Aumento == true) { AUX->Altura--; }
+			Rotacion(*AUX);
 			return agregado;
 		}
 		else {
 			NAVL Nuevo = new NodoAVL(Nombre, Descripcion);
 			AUX->Izquierda = Nuevo;
-			//AUX->Altura--;
+			AUX->Altura--;
 			if (AUX->Derecha == NULL) { Aumento = true; }
 			return true;
 		}
