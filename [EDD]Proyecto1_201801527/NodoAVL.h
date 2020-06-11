@@ -16,10 +16,11 @@ public:
 	NodoAVL();
 	void CalcularAlturas(NodoAVL& Nodo);
 	bool NuevoNodoAVL(std::string Nombre,std::string Descripcion);
-	bool BuscarActivo(NodoAVL& Nodo, std::string Nombre);
-	void Eliminar(NodoAVL& Nodo, std::string Nombre);
 	void EstructuraArbol(NodoAVL& Nodo,std::string NodoPadre);
+	bool EditarActivo(NodoAVL& Nodo, std::string Descripcion, std::string Nombre);
+	bool EliminarActivo(NodoAVL& Nodo, std::string Nombre,int Y);
 	void ImagenArbol();
+	std::string ListaActivo(NodoAVL &Nodo);
 };
 
 

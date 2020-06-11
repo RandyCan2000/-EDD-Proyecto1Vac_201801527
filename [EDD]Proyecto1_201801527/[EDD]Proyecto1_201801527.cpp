@@ -148,6 +148,90 @@ void FormularioAgregarActivo() {
 	}
 }
 
+void FormularioEliminarActivo () {
+	char A[100];
+	char* Activo=A;
+	system("cls");
+	gotoxy(50, 5); SetColor(6);
+	cout << "LISTADO DE ACTIVOS";
+	gotoxy(30, 7); SetColor(9);
+	NAVL ELIMINAR = new NodoAVL(); string listado = ELIMINAR->ListaActivo(*UserLog->Activos);
+	std::string s = listado;
+	std::string delimiter = "\n";
+	size_t pos = 0;
+	std::string token;
+	int ypos = 9;
+	while ((pos = s.find(delimiter)) != std::string::npos) {
+		token = s.substr(0, pos);
+		gotoxy(30, ypos);
+		std::cout << token << std::endl;
+		s.erase(0, pos + delimiter.length());
+		ypos += 2;
+	}
+	gotoxy(30, ypos); SetColor(6);
+	cout << "INGRESE EL NOMBRE DEL ACTIVO A ELIMINAR: ";
+	SetColor(11);cin.getline(Activo,100);
+	//Metodo que elimina Nodo
+	bool ACTELIM=ELIMINAR->EliminarActivo(*UserLog->Activos, ToUpperCase(A), ypos);
+	if (ACTELIM == true) {
+		gotoxy(30, ypos + 10); SetColor(2);
+		cout << "SE ELIMINO EL ACTIVO CORRECTAMENTE";
+	}
+	else {
+		gotoxy(30, ypos + 10); SetColor(4);
+		cout << "NO SE ELIMINO EL ACTIVO CORRECTAMENTE";
+		gotoxy(30, ypos + 12);
+		cout << "NOTA: SI EL ACTIVO SE ENCUENTRA RENTADO NO SE PUEDE ELIMINAR";
+	}
+	getchar();
+	delete ELIMINAR;
+}
+
+void FormularioEditarActivo() {
+	char N[100],D[100];
+	char* Nombre = N,*Descripcion=D;
+	system("cls");
+	gotoxy(50, 5); SetColor(6);
+	cout << "LISTADO DE ACTIVOS";
+	gotoxy(30, 7); SetColor(9);
+	NAVL EDITAR = new NodoAVL(); string listado = EDITAR->ListaActivo(*UserLog->Activos);
+	std::string s = listado;
+	std::string delimiter = "\n";
+	size_t pos = 0;
+	std::string token;
+	int ypos = 9;
+	while ((pos = s.find(delimiter)) != std::string::npos) {
+		token = s.substr(0, pos);
+		gotoxy(30, ypos);
+		std::cout << token << std::endl;
+		s.erase(0, pos + delimiter.length());
+		ypos += 2;
+	}
+	gotoxy(30, ypos); SetColor(6);
+	cout << "INGRESE EL NOMBRE DEL ACTIVO A MODIFICAR: ";
+	SetColor(11); cin.getline(Nombre, 100);
+	gotoxy(30, ypos+2); SetColor(6);
+	cout << "INGRESE LA NUEVA DESCRIPCION: ";
+	SetColor(11); cin.getline(Descripcion, 100);
+	bool Editado = EDITAR->EditarActivo(*UserLog->Activos, ToUpperCase(D), ToUpperCase(N));
+	if (UserLog->Activos!=NULL) {
+		if (Editado == true) {
+			gotoxy(30, ypos + 4); SetColor(2);
+			cout << "SE EDITO EL ACTIVO CORRECTAMENTE";
+		}
+		else {
+			gotoxy(30, ypos + 4); SetColor(4);
+			cout << "NO SE EDITO EL ACTIVO CORRECTAMENTE";
+		}
+	}
+	else {
+		gotoxy(30, ypos + 4); SetColor(4);
+		cout << "NO EXISTEN ACTIVOS";
+	}
+	getchar();
+	delete EDITAR;
+}
+
 void MenuUser() {
 	while (true){
 		system("cls");
@@ -175,8 +259,8 @@ void MenuUser() {
 		if (EsUnNumero(Opcion) == true) {
 			string val = Opcion;
 			if (val == "1") { FormularioAgregarActivo(); }
-			else if (val == "2") { cout << UserLog->Activos->Nombre; getchar(); }
-			else if (val == "3") {}
+			else if (val == "2") { FormularioEliminarActivo(); }
+			else if (val == "3") { FormularioEditarActivo(); }
 			else if (val == "4") {}
 			else if (val == "5") {
 				if (UserLog->Activos!=NULL) {
