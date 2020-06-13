@@ -166,13 +166,8 @@ bool AgregarNodoDepartamento(std::string Departamento, NodoMatriz& User, NodoMat
 	return false;
 }
 
-bool AgregarNodoEntreNodos(NodoMatriz& CabeceraDep, NodoMatriz& CabeceraEmp, NodoMatriz& Usuario) {
+void AgregarNodoEntreNodos(NodoMatriz& CabeceraDep, NodoMatriz& CabeceraEmp, NodoMatriz& Usuario) {
 	NM AuxDep = &CabeceraDep, AuxEmp = &CabeceraEmp, AuxUser = &Usuario;
-	std::string CabDepAnt = AuxDep->Izquierda->Departamento,CabDepSig="";
-	std::string CabEmpAnt = AuxEmp->Arriba->Empresa, CabEmpSig = "";
-	if (AuxDep->Derecha != NULL) { CabDepSig = AuxDep->Derecha->Departamento; }
-	if (AuxEmp->Abajo != NULL) { CabEmpSig = AuxEmp->Abajo->Empresa; }
-	bool AGGHorizontal = false;
 	while (AuxEmp!=NULL){
 		if (strcmp(AuxUser->Departamento.c_str(), AuxEmp->Departamento.c_str()) == 1) {
 			if (AuxEmp->Derecha!=NULL) {
@@ -182,14 +177,12 @@ bool AgregarNodoEntreNodos(NodoMatriz& CabeceraDep, NodoMatriz& CabeceraEmp, Nod
 					AuxUser->Izquierda = AuxEmp;
 					Sig->Izquierda = AuxUser;
 					AuxUser->Derecha = Sig;
-					AGGHorizontal = true;
 					break;
 				}
 			}
 			else {
 				AuxEmp->Derecha = AuxUser;
 				AuxUser->Izquierda = AuxEmp;
-				AGGHorizontal = true;
 				break;
 			}
 		}
@@ -199,134 +192,84 @@ bool AgregarNodoEntreNodos(NodoMatriz& CabeceraDep, NodoMatriz& CabeceraEmp, Nod
 		if (strcmp(AuxUser->Empresa.c_str(), AuxDep->Empresa.c_str()) == 1) {
 			if (AuxDep->Abajo!=NULL) {
 				if (strcmp(AuxUser->Empresa.c_str(), AuxDep->Abajo->Empresa.c_str()) == -1) {
-					if (AGGHorizontal==true) {
-						NM Sig = AuxDep->Abajo;
-						AuxDep->Abajo = AuxUser;
-						AuxUser->Arriba = AuxDep;
-						Sig->Arriba = AuxUser;
-						AuxUser->Abajo = Sig;
-						return true;
-					}
-					else {//QuitarEnlaces Horizontales
-						NM Ant = AuxUser->Izquierda, Sig = AuxUser->Derecha;
-						Ant->Derecha = Sig;
-						if (Sig!=NULL) {
-							Sig->Izquierda = Ant;
-						}
-					}
+					NM Sig = AuxDep->Abajo;
+					AuxDep->Abajo = AuxUser;
+					AuxUser->Arriba = AuxDep;
+					Sig->Arriba = AuxUser;
+					AuxUser->Abajo = Sig;
+						
 				}
 			}
 			else {
-				if (AGGHorizontal == true) {
 					AuxDep->Abajo = AuxUser;
 					AuxUser->Arriba = AuxDep;
-					return true;
-				}
-				else {//QuitarEnlaces Horizontales
-					NM Ant = AuxUser->Izquierda, Sig = AuxUser->Derecha;
-					Ant->Derecha = Sig;
-					if (Sig != NULL) {
-						Sig->Izquierda = Ant;
-					}
-				}
+					break;
 			}
 		}
 		AuxDep = AuxDep->Abajo;
 	}
-	return false;
 }
 
 bool NodoMatriz::AgregarNodo(std::string Usuario, std::string Contrasena, std::string Departamento, std::string Empresa) {
 	NM Dep = InicioMatriz;
 	NM Emp = InicioMatriz;
-	while (Dep != NULL){
-		if (Departamento == Dep->Departamento) { break; }
-		Dep = Dep->Derecha;
-	}
-	while (Emp != NULL) {
-		if (Empresa == Emp->Empresa) { break; }
-		Emp = Emp->Abajo;
-	}
-	if (Dep!=NULL && Emp!=NULL) {
-		NM CabeceraDep = Dep,CabeceraEmp=Emp;
-		while (Dep!=NULL){
-			if (Dep->Departamento==Departamento && Dep->Empresa==Empresa) {
-				while (Dep!=NULL){
-					if (Dep->Usuario == Usuario) { return false; }
-					else if (Dep->Atras==NULL) {
-						NM Nuevo = new NodoMatriz(Usuario,Contrasena,Departamento,Empresa);
-						Dep->Atras = Nuevo;
-						Nuevo->Adelante = Dep;
-						return true;
-					}
-					Dep = Dep->Atras;
-				}
-			}
-			Dep = Dep->Abajo;
+	NM BUSCADO=BuscarUsuario(Usuario,Departamento,Empresa);
+	if (BUSCADO==NULL) {
+		while (Dep != NULL) {
+			if (Departamento == Dep->Departamento) { break; }
+			Dep = Dep->Derecha;
 		}
-		//Casos
-		NM Nuevo = new NodoMatriz(Usuario,Contrasena,Departamento,Empresa);
-		return AgregarNodoEntreNodos(*CabeceraDep,*CabeceraEmp,*Nuevo);
-	}
-	else if (Dep == NULL && Emp == NULL) {
-		NM NuevoDep = new NodoMatriz(Departamento, true);
-		NM NuevoEmp = new NodoMatriz(Empresa, false);
-		NM NuevoUser = new NodoMatriz(Usuario, Contrasena, Departamento, Empresa);
-		if (AgregarNodoDepartamento(Departamento,*NuevoUser,*NuevoDep)==true) {
-			if (AgregarNodoEmpresa(Empresa, *NuevoUser, *NuevoEmp) == true) { return true; }
-		}
-	}
-	else if (Dep != NULL && Emp == NULL) {
-		NM NuevoEmp = new NodoMatriz(Empresa,false);
-		NM NuevoUser = new NodoMatriz(Usuario, Contrasena, Departamento, Empresa);
-		AgregarNodoEmpresa(Empresa, *NuevoUser, *NuevoEmp);
-		NM Aux = NuevoEmp->Arriba;
-		std::string EmpAnterior = Aux->Empresa;
-		while (Dep!=NULL){
-			if (Dep->Empresa==EmpAnterior) {
-				if (Dep->Abajo!=NULL) {
-					NM Aux = Dep->Abajo;
-					Dep->Abajo = NuevoUser;
-					Aux->Arriba = NuevoUser;
-					NuevoUser->Arriba = Dep;
-					NuevoUser->Abajo = Aux;
-					return true;
-				}
-				else {
-					Dep->Abajo = NuevoUser;
-					NuevoUser->Arriba = Dep;
-					return true;
-				}
-			}
-			Dep = Dep->Abajo;
-		}
-	}
-	else if (Dep == NULL && Emp != NULL) {
-		NM NuevoDep = new NodoMatriz(Departamento, true);
-		NM NuevoUser = new NodoMatriz(Usuario, Contrasena, Departamento, Empresa);
-		AgregarNodoDepartamento(Departamento,*NuevoUser,*NuevoDep);
-		NM Aux = NuevoDep->Izquierda;
-		std::string DepAnterior = Aux->Departamento;
 		while (Emp != NULL) {
-			if (Emp->Departamento==DepAnterior) {
-				if (Emp->Derecha!=NULL) {
-					NM Aux = Emp->Derecha;
-					Emp->Derecha = NuevoUser;
-					Aux->Izquierda = NuevoUser;
-					NuevoUser->Derecha = Aux;
-					NuevoUser->Izquierda = Emp;
-					return true;
+			if (Empresa == Emp->Empresa) { break; }
+			Emp = Emp->Abajo;
+		}
+		if (Dep != NULL && Emp != NULL) {
+			NM CabeceraDep = Dep, CabeceraEmp = Emp;
+			while (Dep != NULL) {
+				if (Dep->Departamento == Departamento && Dep->Empresa == Empresa) {
+					while (Dep != NULL) {
+						if (Dep->Atras == NULL) {
+							NM Nuevo = new NodoMatriz(Usuario, Contrasena, Departamento, Empresa);
+							Dep->Atras = Nuevo;
+							Nuevo->Adelante = Dep;
+							return true;
+						}
+						Dep = Dep->Atras;
+					}
 				}
-				else {
-					Emp->Derecha = NuevoUser;
-					NuevoUser->Izquierda = Emp;
-					return true;
-				}
+				Dep = Dep->Abajo;
 			}
-			Emp = Emp->Derecha;
+			//Casos
+			NM Nuevo = new NodoMatriz(Usuario, Contrasena, Departamento, Empresa);
+			AgregarNodoEntreNodos(*CabeceraDep, *CabeceraEmp, *Nuevo);
+			return true;
+		}
+		else if (Dep == NULL && Emp == NULL) {
+			NM NuevoDep = new NodoMatriz(Departamento, true);
+			NM NuevoEmp = new NodoMatriz(Empresa, false);
+			NM NuevoUser = new NodoMatriz(Usuario, Contrasena, Departamento, Empresa);
+			if (AgregarNodoDepartamento(Departamento, *NuevoUser, *NuevoDep) == true) {
+				if (AgregarNodoEmpresa(Empresa, *NuevoUser, *NuevoEmp) == true) { return true; }
+			}
+		}
+		else if (Dep != NULL && Emp == NULL) {
+			NM NuevoEmp = new NodoMatriz(Empresa, false);
+			NM NuevoUser = new NodoMatriz(Usuario, Contrasena, Departamento, Empresa);
+			AgregarNodoEmpresa(Empresa, *NuevoUser, *NuevoEmp);
+			AgregarNodoEntreNodos(*Dep, *NuevoEmp, *NuevoUser);
+			return true;
+		}
+		else if (Dep == NULL && Emp != NULL) {
+			NM NuevoDep = new NodoMatriz(Departamento, true);
+			NM NuevoUser = new NodoMatriz(Usuario, Contrasena, Departamento, Empresa);
+			AgregarNodoDepartamento(Departamento, *NuevoUser, *NuevoDep);
+			AgregarNodoEntreNodos(*NuevoDep, *Emp, *NuevoUser); 
+			return true;
 		}
 	}
-	return false;
+	else {
+		return false;
+	}
 }
 
 
@@ -476,13 +419,13 @@ void NodoMatriz::RepMatriz() {
 	fs << "MATRIZ [ label =\"USUARIOS\",width = 1.5, group=1];\n";
 	Aux = Aux->Abajo;
 	while (Aux!=NULL) {
-		fs << "E" << Aux->Empresa << " [ label=\""<<Aux->Empresa << "\",width = 1.5, group=1];\n";
+		fs << "E" << Aux->Empresa << " [ label=\""<<Aux->Empresa << "\",width = 1.5,fillcolor = slategrey, group=1];\n";
 		Aux = Aux->Abajo;
 	}
 	int Contador = 2;
 	Aux = InicioMatriz->Derecha;
 	while (Aux != NULL) {
-		fs << "D" << Aux->Departamento << " [ label=\"" << Aux->Departamento << "\",width = 1.5, group="<< std::to_string(Contador) <<"];\n";
+		fs << "D" << Aux->Departamento << " [ label=\"" << Aux->Departamento << "\",width = 1.5,fillcolor=seagreen, group="<< std::to_string(Contador) <<"];\n";
 		Contador++;
 		Aux = Aux->Derecha;
 	}
@@ -518,7 +461,7 @@ void NodoMatriz::RepMatriz() {
 		NM Cabecera = Aux;
 		Aux = Aux->Abajo;
 		while (Aux != NULL) {
-			fs << "USER" << Aux->Departamento << Aux->Empresa << " [label=\"" + Aux->Usuario + "\", width = 1.5, group=" + std::to_string(Contador) + "];\n";
+			fs << "USER" << Aux->Departamento << Aux->Empresa << " [label=\"" + Aux->Usuario + "\", width = 1.5,fillcolor=\"#967373\", group=" + std::to_string(Contador) + "];\n";
 			//Aqui Se crea el reporte si existen mas usuarios atras del principal
 			Aux = Aux->Abajo;
 		}
