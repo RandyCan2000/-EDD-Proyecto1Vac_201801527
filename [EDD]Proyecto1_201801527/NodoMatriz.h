@@ -27,5 +27,9 @@ public:
 	NodoMatriz();
 	void BuscarNodo(std::string Usuario, std::string Contrasena, std::string Departamento, std::string Empresa);
 	bool AgregarNodo(std::string Usuario, std::string Contrasena, std::string Departamento, std::string Empresa);
+	bool ReporteActivosEmpresa(std::string NombreEmpresa);
+	bool ReporteActivosDepartamento(std::string NombreDepartamento);
+	NM BuscarUsuario(std::string Usuario, std::string Departamento, std::string Empresa);
 	std::string ImprimirMatriz();
+	void RepMatriz();
 }; 

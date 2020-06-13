@@ -5,7 +5,6 @@
 #include <fstream>
 #include <stdlib.h>
 std::string ArbolAVL="";
-int ContadorNodo=0;
 std::string ListadoActivos="";
 bool Equilibrado = false;
 
@@ -478,22 +477,25 @@ void NodoAVL::EstructuraArbol(NodoAVL& Nodo, std::string NodoPadre) {
 	}
 }
 
-void NodoAVL::ImagenArbol() {
+void NodoAVL::ImagenArbol(NodoAVL& Nodo) {
+	NAVL Aux = &Nodo;
 	std::ofstream fs("C:\\GraficasE\\ArbolUnicoUser.dot");
 	fs << "digraph G {" << std::endl;
 	fs << "node [margin=0, shape=circle, style=filled];"<<std::endl;
-	EstrucArbol = ""; ContadorNodo = 0;
-	EstrucArbol += "N"+std::to_string(ContadorNodo);
-	std::string NP = "N" + std::to_string(ContadorNodo);
-	if (UserLog->Activos->Rentado == true) {
-		EstrucArbol += "[fillcolor=red ";
+	if (Aux!=NULL) {
+		EstrucArbol = ""; ContadorNodo = 0;
+		EstrucArbol += "N" + std::to_string(ContadorNodo);
+		std::string NP = "N" + std::to_string(ContadorNodo);
+		if (Aux->Rentado == true) {
+			EstrucArbol += "[fillcolor=red ";
+		}
+		else {
+			EstrucArbol += "[fillcolor=green ";
+		}
+		EstrucArbol += "label=\"" + Aux->Nombre + " A:" + std::to_string(Aux->Altura) + "\"];\n";
+		NNodoARBOl++;
+		EstructuraArbol(*Aux, NP);
 	}
-	else {
-		EstrucArbol += "[fillcolor=green ";
-	}
-	EstrucArbol += "label=\"" + UserLog->Activos->Nombre +" A:"+ std::to_string(UserLog->Activos->Altura) +"\"];\n";
-	NNodoARBOl++;
-	EstructuraArbol(*UserLog->Activos, NP);
 	fs << EstrucArbol;
 	fs << "}" << std::endl;
 	fs.close();

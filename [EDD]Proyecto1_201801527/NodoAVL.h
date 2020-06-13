@@ -19,7 +19,7 @@ public:
 	void EstructuraArbol(NodoAVL& Nodo,std::string NodoPadre);
 	bool EditarActivo(NodoAVL& Nodo, std::string Descripcion, std::string Nombre);
 	bool EliminarActivo(NodoAVL& Nodo, std::string Nombre,int Y);
-	void ImagenArbol();
+	void ImagenArbol(NodoAVL& Nodo);
 	std::string ListaActivo(NodoAVL &Nodo);
 };
 

@@ -12,6 +12,7 @@
 	extern bool Admin;
 	extern std::string EstrucArbol;
 	extern int NNodoARBOl;
+	extern int ContadorNodo;
 
 	std::string ToUpperCase(std::string Texto);
 	void gotoxy(int x, int y);

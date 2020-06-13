@@ -11,6 +11,7 @@ bool Admin = false;
 NM UserLog = NULL;
 std::string EstrucArbol = "";
 int NNodoARBOl = 0;
+int ContadorNodo = 0;
 
 std::string ToUpperCase(std::string Texto) {
     int i = 0;

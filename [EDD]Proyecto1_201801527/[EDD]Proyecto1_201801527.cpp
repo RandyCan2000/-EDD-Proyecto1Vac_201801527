@@ -60,7 +60,84 @@ void FormularioRegistro() {
 	}
 }
 
+void ReporteActDep() {
+	char D[100];
+	char* Departamento = D;
+	system("cls");
+	gotoxy(30, 5); SetColor(6); cout << "INGRESE EL NOMBRE DEL DEPARTAMENTO: ";
+	SetColor(11); cin.getline(Departamento, 100);
+	NM Arbol = new NodoMatriz();
+	bool a=Arbol->ReporteActivosDepartamento(ToUpperCase(D));
+	if (a==true){
+		gotoxy(30, 7); SetColor(2); cout << "SE CREO EL REPORTE CON EXITO";
+	}
+	else {
+		gotoxy(30, 7); SetColor(4); cout << "NO SE CREO EL REPORTE CON EXITO";
+	}
+	getchar(); delete Arbol;
+}
 
+void RepActEmpresa() {
+	char E[100];
+	char* Empresa = E;
+	system("cls");
+	gotoxy(30, 5); SetColor(6); cout << "INGRESE EL NOMBRE DE LA EMPRESA: ";
+	SetColor(11); cin.getline(Empresa, 100);
+	NM Arbol = new NodoMatriz();
+	bool a=Arbol->ReporteActivosEmpresa(ToUpperCase(E));
+	if (a == true) {
+		gotoxy(30, 7); SetColor(2); cout << "SE CREO EL REPORTE CON EXITO";
+	}
+	else {
+		gotoxy(30, 7); SetColor(4); cout << "NO SE CREO EL REPORTE CON EXITO";
+	}
+	getchar();
+	delete Arbol;
+}
+
+void RepActUser() {
+	system("cls");
+	char U[100], D[100], E[100];
+	char* Usuario = U, * Departamento = D, * Empresa = E;
+	gotoxy(50, 5); SetColor(6);
+	cout << "DATOS DEL USUARIO";
+	gotoxy(30, 7); SetColor(9);
+	cout << "USUARIO: "; SetColor(11); cin.getline(Usuario, 100);
+	gotoxy(30, 9); SetColor(9);
+	cout << "DEPARTAMENTO: "; SetColor(11); cin.getline(Departamento, 100);
+	gotoxy(30, 11); SetColor(9);
+	cout << "EMPRESA: "; SetColor(11); cin.getline(Empresa, 100);
+	if (ToUpperCase(U) != ""  && ToUpperCase(D) != "" && ToUpperCase(E) != "") {
+		NM Buscar = new NodoMatriz();
+		NM USER = Buscar->BuscarUsuario(U,ToUpperCase(D), ToUpperCase(E));
+		if (USER != NULL) {
+			NAVL AVL = new NodoAVL();
+			if (USER->Activos!=NULL) {
+				AVL->ImagenArbol(*USER->Activos);
+				gotoxy(30, 13); SetColor(2);
+				cout << "SE CREO EL REPORTE CON EXITO";
+				getchar();
+			}
+			else {
+				gotoxy(30, 13); SetColor(4);
+				cout << "EL USUARIO NO TIENE ACTIVOS";
+				getchar();
+			}
+			delete AVL;
+		}
+		else {
+			gotoxy(30, 13); SetColor(4);
+			cout << "EL USUARIO NO EXISTE";
+			getchar();
+		}
+		delete Buscar;
+	}
+	else {
+		gotoxy(30, 13); SetColor(4);
+		cout << "DEBE LLENAR TODOS LOS CAMPOS";
+		getchar();
+	}
+}
 void MenuAdmin() {
 	do{
 		system("cls");
@@ -94,11 +171,11 @@ void MenuAdmin() {
 		if (EsUnNumero(Opcion) == true) {
 			string val = Opcion;
 			if (val == "1") { FormularioRegistro();}
-			else if (val == "2") { NM MAT = new NodoMatriz(); string T = MAT->ImprimirMatriz(); cout << T; getchar(); delete MAT; }
-			else if (val == "3") {}
-			else if (val == "4") {}
+			else if (val == "2") { NM MAT = new NodoMatriz(); MAT->RepMatriz(); delete MAT; }
+			else if (val == "3") { ReporteActDep(); }
+			else if (val == "4") { RepActEmpresa(); }
 			else if (val == "5") {}
-			else if (val == "6") {}
+			else if (val == "6") { RepActUser(); }
 			else if (val == "7") {}
 			else if (val == "8") {}
 			else if (val == "9") { break; }
@@ -265,7 +342,7 @@ void MenuUser() {
 			else if (val == "5") {
 				if (UserLog->Activos!=NULL) {
 					NAVL AVL = new NodoAVL();
-					AVL->ImagenArbol();
+					AVL->ImagenArbol(*UserLog->Activos);
 					SetColor(2);
 					cout << "SE CREO EL REPORTE CON EXITO";
 					getchar();
