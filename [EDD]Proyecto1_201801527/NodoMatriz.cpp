@@ -197,7 +197,7 @@ void AgregarNodoEntreNodos(NodoMatriz& CabeceraDep, NodoMatriz& CabeceraEmp, Nod
 					AuxUser->Arriba = AuxDep;
 					Sig->Arriba = AuxUser;
 					AuxUser->Abajo = Sig;
-						
+					break;
 				}
 			}
 			else {
