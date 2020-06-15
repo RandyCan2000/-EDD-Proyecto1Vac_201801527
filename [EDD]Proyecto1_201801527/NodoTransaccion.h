@@ -21,5 +21,7 @@ public:
 	std::string ListadoActivosRentados();
 	bool QuitarRenta(std::string ID_Renta);
 	void ReporteTransacciones();
+	void ReporteTransaccionesUnUsuario(NodoMatriz& User);
+	void BubbleSort(bool ASC_DESC);
 };
 

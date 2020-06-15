@@ -124,3 +124,118 @@ void NodoTransaccion::ReporteTransacciones() {
 	system("C:\\\"Program Files (x86)\"\\Graphviz2.38\\bin\\dot.exe -Tpng C:\\GraficasE\\TodasLasTransacciones.dot -o C:\\GraficasE\\TodasLasTransacciones.png");
 	system("C:\\GraficasE\\TodasLasTransacciones.png &");
 }
+
+void NodoTransaccion::ReporteTransaccionesUnUsuario(NodoMatriz& User) {
+	NM USER = &User;
+	std::ofstream fs("C:\\GraficasE\\TransaccionesUnUsuario.dot");
+	fs << "digraph G {" << std::endl;
+	fs << "node [margin=0, shape=box, style=filled];" << std::endl;
+	NT Aux = InicioTransacciones;
+	int Contador = 0;
+	while (Aux != NULL) {
+		if (Aux->UserRentador== USER) {
+			fs << "R" << Contador << "[label=\"ID: " << Aux->ID << "\\n" << "RENTA: " << Aux->UserRenta->Usuario << "\\n" << "ACTIVO: " << Aux->Activo->Nombre << "\\n" << "RENTADOR: " << Aux->UserRentador->Usuario << "\"];\n";
+			Contador++;
+		}
+		Aux = Aux->Siguiente;
+		if (Aux == InicioTransacciones) { break; }
+	}
+	Contador = 0;
+	std::string Rank = "";
+	Aux = InicioTransacciones;
+	while (Aux != NULL) {
+		if (Aux->UserRentador==USER) {
+			if (Aux->Siguiente != InicioTransacciones) {
+				fs << "R" << Contador << " -> " << "R" << Contador + 1 << " [dir=\"both\"];\n";
+				Rank += "R" + std::to_string(Contador) + ";";
+			}
+			Contador++;
+		}
+		Aux = Aux->Siguiente;
+		if (Aux == InicioTransacciones) {
+			Rank += "R" + std::to_string(Contador - 1) + ";";
+			fs << "R" << Contador - 1 << " -> " << "R0" << " [dir=\"both\"];\n";
+			break;
+		}
+	}
+	fs << "{" << " rank = same ; " << Rank << "}";
+	fs << "}" << std::endl;
+	fs.close();
+	system("C:\\\"Program Files (x86)\"\\Graphviz2.38\\bin\\dot.exe -Tpng C:\\GraficasE\\TransaccionesUnUsuario.dot -o C:\\GraficasE\\TransaccionesUnUsuario.png");
+	system("C:\\GraficasE\\TransaccionesUnUsuario.png &");
+}
+
+void NodoTransaccion::BubbleSort(bool ASC_DESC) {//true ASCENDENTE false DESCENDENTE
+	if (InicioTransacciones!=FinTransacciones) {
+		std::string ID = "";
+		NAVL Activo = NULL;
+		NM UserRenta = NULL;
+		NM UserRentador = NULL;
+		time_t FechaRenta = NULL;
+		int DiasRenta = 0;
+		if (ASC_DESC==true) {
+			NT Aux1 = InicioTransacciones;
+			while (Aux1!=NULL){
+				NT Aux2 = Aux1->Siguiente;
+				while (Aux2!=NULL){
+					if (strcmp(Aux1->ID.c_str(), Aux2->ID.c_str()) == 1) {
+						ID = Aux1->ID; 
+						Activo = Aux1->Activo; 
+						UserRenta = Aux1->UserRenta; 
+						UserRentador = Aux1->UserRentador;
+						FechaRenta = Aux1->FechaRenta; 
+						DiasRenta = Aux1->DiasRenta;
+						Aux1->ID = Aux2->ID; 
+						Aux1->Activo = Aux2->Activo; 
+						Aux1->UserRenta = Aux2->UserRenta;
+						Aux1->UserRentador = Aux2->UserRentador; 
+						Aux1->FechaRenta = Aux2->FechaRenta;
+						Aux1->DiasRenta = Aux2->DiasRenta;
+						Aux2->ID = ID; 
+						Aux2->Activo = Activo; 
+						Aux2->UserRenta =UserRenta;
+						Aux2->UserRentador = UserRentador; 
+						Aux2->FechaRenta = FechaRenta;
+						Aux2->DiasRenta = DiasRenta;
+					}
+					Aux2 = Aux2->Siguiente;
+					if (Aux2 == InicioTransacciones) { break; }
+				}
+				Aux1 = Aux1->Siguiente;
+				if (Aux1 == FinTransacciones) { break; }
+			}
+		}
+		else{
+			NT Aux1 = InicioTransacciones;
+			while (Aux1 != NULL) {
+				NT Aux2 = Aux1->Siguiente;
+				while (Aux2 != NULL) {
+					if (strcmp(Aux1->ID.c_str(), Aux2->ID.c_str()) == -1) {
+						ID = Aux1->ID;
+						Activo = Aux1->Activo;
+						UserRenta = Aux1->UserRenta;
+						UserRentador = Aux1->UserRentador;
+						FechaRenta = Aux1->FechaRenta;
+						DiasRenta = Aux1->DiasRenta;
+						Aux1->ID = Aux2->ID;
+						Aux1->Activo = Aux2->Activo;
+						Aux1->UserRenta = Aux2->UserRenta;
+						Aux1->UserRentador = Aux2->UserRentador;
+						Aux1->FechaRenta = Aux2->FechaRenta;
+						Aux1->DiasRenta = Aux2->DiasRenta;
+						Aux2->ID = ID;
+						Aux2->Activo = Activo;
+						Aux2->UserRenta = UserRenta;
+						Aux2->UserRentador = UserRentador;
+						Aux2->FechaRenta = FechaRenta;
+						Aux2->DiasRenta = DiasRenta;
+					}
+					Aux2 = Aux2->Siguiente;
+					if (Aux2 == InicioTransacciones) { break; }
+				}
+				Aux1 = Aux1->Siguiente;
+				if (Aux1 == FinTransacciones) { break; }
+			}
+		}
+	}
+}

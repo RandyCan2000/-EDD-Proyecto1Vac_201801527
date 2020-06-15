@@ -138,6 +138,42 @@ void RepActUser() {
 		getchar();
 	}
 }
+
+void MenuRepRentaUnUsuario() {
+	system("cls");
+	char U[100], D[100], E[100];
+	char* Usuario = U, * Departamento = D, * Empresa = E;
+	gotoxy(50, 5); SetColor(6);
+	cout << "DATOS DEL USUARIO";
+	gotoxy(30, 7); SetColor(9);
+	cout << "USUARIO: "; SetColor(11); cin.getline(Usuario, 100);
+	gotoxy(30, 9); SetColor(9);
+	cout << "DEPARTAMENTO: "; SetColor(11); cin.getline(Departamento, 100);
+	gotoxy(30, 11); SetColor(9);
+	cout << "EMPRESA: "; SetColor(11); cin.getline(Empresa, 100);
+	if (ToUpperCase(U) != "" && ToUpperCase(D) != "" && ToUpperCase(E) != "") {
+		NM Buscar = new NodoMatriz();
+		NM USER = Buscar->BuscarUsuario(U, ToUpperCase(D), ToUpperCase(E));
+		if (USER != NULL) {
+			gotoxy(30, 13); SetColor(2);
+			NT Rep = new NodoTransaccion();
+			Rep->ReporteTransaccionesUnUsuario(*USER);
+			cout << "SE CREO EL REPORTE CON EXITO";
+			getchar();
+		}
+		else {
+			gotoxy(30, 13); SetColor(4);
+			cout << "EL USUARIO NO EXISTE";
+			getchar();
+		}
+		delete Buscar;
+	}
+	else {
+		gotoxy(30, 13); SetColor(4);
+		cout << "DEBE LLENAR TODOS LOS CAMPOS";
+		getchar();
+	}
+}
 void MenuAdmin() {
 	do{
 		system("cls");
@@ -176,8 +212,51 @@ void MenuAdmin() {
 			else if (val == "4") { RepActEmpresa(); }
 			else if (val == "5") { NT REP = new NodoTransaccion(); REP->ReporteTransacciones(); SetColor(2); cout << "REPORTE CREADO CON EXITO"; getchar(); delete REP; }
 			else if (val == "6") { RepActUser(); }
-			else if (val == "7") {}
-			else if (val == "8") {}
+			else if (val == "7") { MenuRepRentaUnUsuario(); }
+			else if (val == "8") {
+				char N[100];
+				char* Numero = N;
+				system("cls");
+				gotoxy(50, 5); SetColor(6);
+				cout << "ORDENAR LISTA DE TRANSACCIONES";
+				gotoxy(30, 7); SetColor(9);
+				cout << "1. ORDEN ASCENDETE";
+				gotoxy(30, 9); 
+				cout << "2. ORDEN DESCENDETE";
+				gotoxy(30, 11); SetColor(6);
+				cout << "SELECCION EL TIPO DE ORDEN: ";
+				SetColor(11); cin.getline(Numero,100);
+				if (EsUnNumero(N)==true) {
+					gotoxy(30, 13); SetColor(2);
+					string val1 = Numero;
+					NT Ordenamiento = new NodoTransaccion();
+					if (val1=="1") { 
+						Ordenamiento->BubbleSort(true);
+						cout << "ORDENADO DE FORMA ASCENDENTE"; 
+						getchar();
+					}
+					else if (val1 == "2") { 
+						Ordenamiento->BubbleSort(false);
+						cout << "ORDENADO DE FORMA DESCENDENTE"; 
+						getchar();
+					}
+					else {
+						SetColor(4); cout << "OPCION NO ENCONTRADA"; getchar();
+					}
+					NT REP = new NodoTransaccion(); 
+					REP->ReporteTransacciones(); 
+					SetColor(2); gotoxy(30, 15);
+					cout << "REPORTE CREADO CON EXITO"; 
+					getchar(); 
+					delete REP;
+					delete Ordenamiento;
+				}
+				else {
+					gotoxy(30, 13); SetColor(4);
+					cout << "INGRESE UNICAMENTE NUMEROS";
+					getchar();
+				}
+			}
 			else if (val == "9") { break; }
 			else {
 				SetColor(4);
