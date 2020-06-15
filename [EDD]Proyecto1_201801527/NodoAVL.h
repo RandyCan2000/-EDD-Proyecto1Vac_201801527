@@ -20,7 +20,8 @@ public:
 	bool EditarActivo(NodoAVL& Nodo, std::string Descripcion, std::string Nombre);
 	bool EliminarActivo(NodoAVL& Nodo, std::string Nombre,int Y);
 	void ImagenArbol(NodoAVL& Nodo);
-	std::string ListaActivo(NodoAVL &Nodo);
+	std::string ListaActivo(NodoAVL &Nodo, bool ActivRentados);
+	NAVL BuscarActivo(NodoAVL& Nodo,std::string NombreActivo);
 };
 
 

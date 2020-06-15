@@ -32,4 +32,5 @@ public:
 	NM BuscarUsuario(std::string Usuario, std::string Departamento, std::string Empresa);
 	std::string ImprimirMatriz();
 	void RepMatriz();
+	std::string ListarTodosLosActivos();
 }; 

@@ -2,7 +2,7 @@
 #include "Globales.h"
 #include "NodoMatriz.h"
 #include "NodoAVL.h"
-
+#include "NodoTransaccion.h"
 
 
 using namespace std;
@@ -174,7 +174,7 @@ void MenuAdmin() {
 			else if (val == "2") { NM MAT = new NodoMatriz(); MAT->RepMatriz(); delete MAT; }
 			else if (val == "3") { ReporteActDep(); }
 			else if (val == "4") { RepActEmpresa(); }
-			else if (val == "5") {}
+			else if (val == "5") { NT REP = new NodoTransaccion(); REP->ReporteTransacciones(); SetColor(2); cout << "REPORTE CREADO CON EXITO"; getchar(); delete REP; }
 			else if (val == "6") { RepActUser(); }
 			else if (val == "7") {}
 			else if (val == "8") {}
@@ -232,7 +232,7 @@ void FormularioEliminarActivo () {
 	gotoxy(50, 5); SetColor(6);
 	cout << "LISTADO DE ACTIVOS";
 	gotoxy(30, 7); SetColor(9);
-	NAVL ELIMINAR = new NodoAVL(); string listado = ELIMINAR->ListaActivo(*UserLog->Activos);
+	NAVL ELIMINAR = new NodoAVL(); string listado = ELIMINAR->ListaActivo(*UserLog->Activos,true);
 	std::string s = listado;
 	std::string delimiter = "\n";
 	size_t pos = 0;
@@ -271,7 +271,7 @@ void FormularioEditarActivo() {
 	gotoxy(50, 5); SetColor(6);
 	cout << "LISTADO DE ACTIVOS";
 	gotoxy(30, 7); SetColor(9);
-	NAVL EDITAR = new NodoAVL(); string listado = EDITAR->ListaActivo(*UserLog->Activos);
+	NAVL EDITAR = new NodoAVL(); string listado = EDITAR->ListaActivo(*UserLog->Activos,true);
 	std::string s = listado;
 	std::string delimiter = "\n";
 	size_t pos = 0;
@@ -309,6 +309,147 @@ void FormularioEditarActivo() {
 	delete EDITAR;
 }
 
+void PedirDatosActivoARentar(int PosY) {
+	char U[100], D[100], E[100], N[100],DR[100];
+	char* Usuario = U, * Departamento = D, * Empresa = E, * NombreActivo = N,*DiasRenta=DR;
+	gotoxy(30, PosY); SetColor(6); cout << "USUARIO: "; SetColor(11); cin.getline(Usuario, 100); PosY = PosY + 2;
+	gotoxy(30, PosY); SetColor(6); cout << "DEPARTAMENTO: "; SetColor(11); cin.getline(Departamento, 100); PosY = PosY + 2;
+	gotoxy(30, PosY); SetColor(6); cout << "EMPRESA: "; SetColor(11); cin.getline(Empresa, 100); PosY = PosY + 2;
+	gotoxy(30, PosY); SetColor(6); cout << "NOMBRE DEL ACTIVO A RENTAR: "; SetColor(11); cin.getline(NombreActivo, 100); PosY = PosY + 2;
+	gotoxy(30, PosY); SetColor(6); cout << "DIAS A RENTAR EL ACTIVO: "; SetColor(11); cin.getline(DiasRenta, 100); PosY = PosY + 2;
+	if (ToUpperCase(U)!="" && ToUpperCase(D) != "" && ToUpperCase(E) != "" && ToUpperCase(N) != "" && ToUpperCase(DR) != "") {
+		if (EsUnNumero(DR)==true) {
+			//aqui agrega el activo a la lista doble circular
+			NM Buscar = new NodoMatriz();
+			NM UserRenta = Buscar->BuscarUsuario(U, ToUpperCase(D), ToUpperCase(E));
+			if (UserRenta != NULL) {
+				NAVL BuscarActivo = new NodoAVL();
+				NAVL Activo = BuscarActivo->BuscarActivo(*UserRenta->Activos, ToUpperCase(N));
+				if (Activo != NULL) {
+					NT AGG = new NodoTransaccion();
+					Activo->Rentado = true;
+					bool agregado=AGG->AgregarRenta(*UserRenta, *Activo,atoi(DR));
+					if (agregado==true) {
+						gotoxy(30, PosY); SetColor(2); cout << "RENTA REALIZADA CON EXITO"; getchar();
+					}
+					else {
+						gotoxy(30, PosY); SetColor(4); cout << "LA RENTA NO SE REALIZO CON EXITO"; getchar();
+					}
+				}
+				else {
+					gotoxy(30, PosY); SetColor(4); cout << "ACTIVO NO ENCONTRADO"; getchar();
+				}
+				delete BuscarActivo;
+			}
+			else {
+				gotoxy(30, PosY); SetColor(4); cout << "USUARIO NO ENCONTRADO"; getchar();
+			}
+			delete Buscar;
+		}
+		else {
+			gotoxy(30, PosY); SetColor(4); cout << "LOS DIAS DEBEN SER NUMEROS"; getchar();
+		}
+	}
+	else {
+		gotoxy(30, PosY); SetColor(4);
+		cout << "HACEN FALTA PARAMETROS";
+		getchar();
+	}
+}
+
+void MenuQuitarRentaActivo() {
+	char I[100];
+	char* ID = I;
+	system("cls");
+	gotoxy(50, 5); SetColor(6);
+	cout << "DEVOLVER ACTIVO";
+	gotoxy(30, 7); SetColor(9);
+	NT Nuevo = new NodoTransaccion();
+	string listado=Nuevo->ListadoActivosRentados();
+	std::string s = listado;
+	std::string delimiter = "\n";
+	size_t pos = 0;
+	std::string token;
+	int ypos = 9;
+	while ((pos = s.find(delimiter)) != std::string::npos) {
+		token = s.substr(0, pos);
+		gotoxy(15, ypos);
+		std::cout << token << std::endl;
+		s.erase(0, pos + delimiter.length());
+		ypos += 2;
+	}
+	gotoxy(30, ypos); SetColor(6); ypos += 2;
+	cout << "INGRESE EL ID DE LA RENTA A DEVOLVER: "; SetColor(11);
+	cin.getline(ID,100);
+	if (ToUpperCase(I)!="") {
+		NT Eliminar = new NodoTransaccion();
+		bool Eliminado = Eliminar->QuitarRenta(ToUpperCase(I));
+		if (Eliminado == true) {
+			gotoxy(30, ypos); SetColor(2);
+			cout << "SE ELIMINO LA RENTA CORRECTAMENTE"; SetColor(11); getchar();
+		}
+		else {
+			gotoxy(30, ypos); SetColor(4);
+			cout << "NO SE ELIMINO LA RENTA CORRECTAMENTE"; SetColor(11); getchar();
+		}
+		delete Eliminar;
+	}
+	else {
+		gotoxy(30, ypos); SetColor(4);
+		cout << "NO INGRESO NINGUN ID"; getchar();
+	}
+}
+
+void MenuRentaActivos() {
+	system("cls");
+	gotoxy(50, 5); SetColor(6);
+	cout << "RENTA DE ACTIVOS";
+	NM ListadoActivos = new NodoMatriz();
+	char O[100]; char* Opcion = O;
+	gotoxy(30, 7); SetColor(9);
+	cout << "1. RENTAR ACTIVO";
+	gotoxy(30, 9);
+	cout << "2. DEVOLVER ACTIVO RENTADO";
+	gotoxy(30, 11); SetColor(6);
+	cout << "SELECCIONE UNA OPCION: ";
+	SetColor(11); cin.getline(Opcion, 100);
+	if (EsUnNumero(Opcion) == true) {
+		string val = Opcion;
+		if (val == "1") {
+			system("cls");
+			gotoxy(50, 5); SetColor(6);
+			cout << "LISTA DE ACTIVOS RENTADOS";
+			std::string listado = ListadoActivos->ListarTodosLosActivos();
+			std::string s = listado;
+			std::string delimiter = "\n";
+			size_t pos = 0;
+			std::string token;
+			int ypos = 7;
+			while ((pos = s.find(delimiter)) != std::string::npos) {
+				token = s.substr(0, pos);
+				if (token[0]=='-') { SetColor(2);}
+				else { SetColor(9); }
+				gotoxy(30, ypos);
+				std::cout << token << std::endl;
+				s.erase(0, pos + delimiter.length());
+				ypos += 2;
+			}
+			PedirDatosActivoARentar(ypos);
+		}
+		else if (val == "2") { MenuQuitarRentaActivo(); }
+		else {
+			SetColor(4);
+			cout << "OPCION NO ENCONTRADA";
+			getchar();
+		}
+	}
+	else {
+		SetColor(4);
+		cout << "INGRESE SOLO NUMEROS";
+		getchar();
+	}
+}
+
 void MenuUser() {
 	while (true){
 		system("cls");
@@ -338,7 +479,7 @@ void MenuUser() {
 			if (val == "1") { FormularioAgregarActivo(); }
 			else if (val == "2") { FormularioEliminarActivo(); }
 			else if (val == "3") { FormularioEditarActivo(); }
-			else if (val == "4") {}
+			else if (val == "4") { MenuRentaActivos(); }
 			else if (val == "5") {
 				if (UserLog->Activos!=NULL) {
 					NAVL AVL = new NodoAVL();

@@ -4,6 +4,8 @@
 #include "Globales.h"
 #include <fstream>
 #include <stdlib.h>
+#include "NodoID.h"
+
 std::string ArbolAVL="";
 std::string ListadoActivos="";
 bool Equilibrado = false;
@@ -12,14 +14,16 @@ void Rotacion(NodoAVL& Nodo);
 
 
 NodoAVL::NodoAVL(std::string Nombre, std::string Descripcion) {
+	NID ID = new NodoID();
 	this->Nombre = Nombre;
 	this->Descripcion = Descripcion;
-	this->ID = "";
+	this->ID =ID->GenerarID();
 	this->Index = IndexActivos;
 	this->Derecha = NULL;
 	this->Izquierda = NULL;
 	this->Rentado = false;
 	this->Altura = 0;
+	delete ID;
 	IndexActivos++;
 }
 NodoAVL::NodoAVL() {
@@ -98,7 +102,7 @@ void RotacionDerecha(NodoAVL & P,NodoAVL &Q) {
 	std::string DesP = AuxP->Descripcion, DesQ = AuxQ->Descripcion;
 	std::string IDP = AuxP->ID, IDQ = AuxQ->ID;
 	AuxP->Nombre = NomQ, AuxP->Descripcion = DesQ; AuxP->ID = IDQ;
-	AuxQ->Nombre = NomP, AuxQ->Descripcion = DesQ; AuxQ->ID = IDP;
+	AuxQ->Nombre = NomP, AuxQ->Descripcion = DesP; AuxQ->ID = IDP;
 	AuxP->Izquierda = AuxQ->Izquierda;
 	AuxQ->Izquierda = AuxQ->Derecha;
 	AuxQ->Derecha = AuxP->Derecha;
@@ -113,8 +117,8 @@ void RotacionIzquierda(NodoAVL& P, NodoAVL& Q) {
 	std::string DesP = AuxP->Descripcion, DesQ = AuxQ->Descripcion;
 	std::string IDP = AuxP->ID, IDQ = AuxQ->ID;
 	AuxP->Nombre = NomQ; AuxP->Descripcion = DesQ; AuxP->ID = IDQ;
-	AuxP->Derecha = AuxQ->Derecha;
 	AuxQ->Nombre = NomP; AuxQ->Descripcion = DesP; AuxQ->ID = IDP;
+	AuxP->Derecha = AuxQ->Derecha;
 	AuxQ->Derecha = AuxQ->Izquierda;
 	AuxQ->Izquierda = AuxP->Izquierda;
 	AuxP->Izquierda = NULL;
@@ -455,7 +459,7 @@ void NodoAVL::EstructuraArbol(NodoAVL& Nodo, std::string NodoPadre) {
 		else {
 			EstrucArbol += "[fillcolor=green ";
 		}
-		EstrucArbol+="label=\"" + Aux->Izquierda->Nombre + " A:" + std::to_string(Aux->Izquierda->Altura) + "\"];\n";
+		EstrucArbol+="label=\"" + Aux->Izquierda->Nombre + "\",xlabel=\"" + std::to_string(Aux->Izquierda->Altura) + "\"];\n";
 		EstrucArbol += NodoPadre + "->" + "N" + std::to_string(NNodoARBOl) + ";\n";
 		std::string NodoP = "N" + std::to_string(NNodoARBOl);
 		NNodoARBOl++;
@@ -469,7 +473,7 @@ void NodoAVL::EstructuraArbol(NodoAVL& Nodo, std::string NodoPadre) {
 		else {
 			EstrucArbol += "[fillcolor=green ";
 		}
-		EstrucArbol += "label=\"" + Aux->Derecha->Nombre +" A:" + std::to_string(Aux->Derecha->Altura) + "\"];\n";
+		EstrucArbol += "label=\"" + Aux->Derecha->Nombre+ "\",xlabel=\"" + std::to_string(Aux->Derecha->Altura) + "\"];\n";
 		EstrucArbol += NodoPadre + "->" + "N" + std::to_string(NNodoARBOl) + ";\n";
 		std::string NodoP = "N" + std::to_string(NNodoARBOl);
 		NNodoARBOl++;
@@ -483,7 +487,7 @@ void NodoAVL::ImagenArbol(NodoAVL& Nodo) {
 	fs << "digraph G {" << std::endl;
 	fs << "node [margin=0, shape=circle, style=filled];"<<std::endl;
 	if (Aux!=NULL) {
-		EstrucArbol = ""; ContadorNodo = 0;
+		EstrucArbol = ""; ContadorNodo = 0; NNodoARBOl = 0;
 		EstrucArbol += "N" + std::to_string(ContadorNodo);
 		std::string NP = "N" + std::to_string(ContadorNodo);
 		if (Aux->Rentado == true) {
@@ -492,7 +496,7 @@ void NodoAVL::ImagenArbol(NodoAVL& Nodo) {
 		else {
 			EstrucArbol += "[fillcolor=green ";
 		}
-		EstrucArbol += "label=\"" + Aux->Nombre + " A:" + std::to_string(Aux->Altura) + "\"];\n";
+		EstrucArbol += "label=\"" + Aux->Nombre+"\",xlabel=\""+std::to_string(Aux->Altura)+"\"];\n";
 		NNodoARBOl++;
 		EstructuraArbol(*Aux, NP);
 	}
@@ -503,31 +507,65 @@ void NodoAVL::ImagenArbol(NodoAVL& Nodo) {
 	system("C:\\GraficasE\\ArbolUnicoUser.png &");
 }
 
-void RecInOrden(NodoAVL& Nodo) {
+void RecInOrden(NodoAVL& Nodo, bool ActivRentados) {
 	NAVL Aux = &Nodo;
 	if (Aux->Izquierda==NULL && Aux->Derecha==NULL) {
-		ListadoActivos += "Nombre: " + Aux->Nombre + " Descripcion: " + Aux->Descripcion+"\n";
+		if (ActivRentados==true) {
+			ListadoActivos += "ID: " + Aux->ID + " Nombre: " + Aux->Nombre + " Descripcion: " + Aux->Descripcion + "\n";
+		}
+		else {
+			if (Aux->Rentado==false) {
+				ListadoActivos += "ID: " + Aux->ID + " Nombre: " + Aux->Nombre + " Descripcion: " + Aux->Descripcion + "\n";
+			}
+		}
 	}
 	else {
 		if (Aux->Izquierda != NULL) {
-			RecInOrden(*Aux->Izquierda);
-			
+			RecInOrden(*Aux->Izquierda, ActivRentados);
 		}
-		ListadoActivos += "Nombre: " + Aux->Nombre + " Descripcion: " + Aux->Descripcion + "\n";
+		if (ActivRentados == true) {
+			ListadoActivos += "ID: " + Aux->ID + " Nombre: " + Aux->Nombre + " Descripcion: " + Aux->Descripcion + "\n";
+		}
+		else {
+			if (Aux->Rentado == false) {
+				ListadoActivos += "ID: " + Aux->ID + " Nombre: " + Aux->Nombre + " Descripcion: " + Aux->Descripcion + "\n";
+			}
+		}
 		if (Aux->Derecha != NULL) {
-			RecInOrden(*Aux->Derecha);
+			RecInOrden(*Aux->Derecha, ActivRentados);
 		}
 	}
 }
 
-std::string NodoAVL::ListaActivo(NodoAVL& Nodo) {
+std::string NodoAVL::ListaActivo(NodoAVL& Nodo,bool ActivRentados) {//si Activo Rentados == true muestra todos los activos si falso muestra los activos sin rentar
 	NAVL AUX = &Nodo;
 	ListadoActivos = "";
 	if (AUX!=NULL) {
-		RecInOrden(*AUX);
+		RecInOrden(*AUX,ActivRentados);
 	}
 	else {
 		ListadoActivos = "SIN ACTIVOS\n";
 	}
 	return ListadoActivos;
+}
+
+NAVL NodoAVL::BuscarActivo(NodoAVL& Nodo, std::string NombreActivo) {
+	NAVL Aux = &Nodo;
+	if (Aux!=NULL) {
+		if (Aux->Nombre == NombreActivo) {
+			return Aux;
+		}
+		else if (strcmp(NombreActivo.c_str(), Aux->Nombre.c_str()) == 1) {
+			return BuscarActivo(*Aux->Derecha, NombreActivo);
+		}
+		else if (strcmp(NombreActivo.c_str(), Aux->Nombre.c_str()) == -1) {
+			return BuscarActivo(*Aux->Izquierda, NombreActivo);
+		}
+		else {
+			return NULL;
+		}
+	}
+	else {
+		return NULL;
+	}
 }

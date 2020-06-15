@@ -2,16 +2,23 @@
 #include "NodoMatriz.h"
 #include <stdio.h>  
 #include <windows.h>  
-
+#include <time.h>
+#include <iomanip>
+#include <ctime>
+#pragma warning(disable:4996)
 
 int IndexUsuarios = 1;
 int IndexActivos = 1;
 NM InicioMatriz = NULL;
 bool Admin = false;
 NM UserLog = NULL;
+NID ListaID = NULL;
 std::string EstrucArbol = "";
 int NNodoARBOl = 0;
 int ContadorNodo = 0;
+NT InicioTransacciones=NULL;
+NT FinTransacciones = NULL;
+
 
 std::string ToUpperCase(std::string Texto) {
     int i = 0;
@@ -53,4 +60,14 @@ void SetColor(int ForgC)
         SetConsoleTextAttribute(hStdOut, wColor);
     }
     return;
+}
+
+time_t Fecha_y_Hora_Actual() {
+    //asi se imprime un time_t
+    time_t now = time(0);
+    /*
+    tm* Fecha = localtime(&now);
+    std::cout << "The local date and time is: " << Fecha->tm_mday<<"/"<<Fecha->tm_mon<<"/"<<Fecha->tm_year + 1900 << std::endl;
+    */
+    return now;
 }

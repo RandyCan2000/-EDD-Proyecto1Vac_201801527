@@ -83,8 +83,10 @@ NM NodoMatriz::BuscarUsuario(std::string Usuario, std::string Departamento, std:
 		return Aux;
 	}
 	else {
+		Aux = Aux->Derecha;
 		while (Aux != NULL) {
 			if (Departamento == Aux->Departamento) {
+				Aux = Aux->Abajo;
 				while (Aux != NULL) {
 					if (Empresa == Aux->Empresa) {
 						while (Aux != NULL) {
@@ -92,14 +94,14 @@ NM NodoMatriz::BuscarUsuario(std::string Usuario, std::string Departamento, std:
 								return Aux;
 							}
 							Aux = Aux->Atras;
-							if (Aux == NULL) { return NULL; }
 						}
 					}
 					Aux = Aux->Abajo;
-					if (Aux==NULL) { return NULL; }
+					if (Aux == NULL) { return NULL; }
 				}
 			}
 			Aux = Aux->Derecha;
+			if (Aux == NULL) { return NULL; }
 		}
 	}
 	return NULL;
@@ -313,7 +315,7 @@ bool NodoMatriz::ReporteActivosEmpresa(std::string NombreEmpresa) {
 					else {
 						EstrucArbol += "[fillcolor=green ";
 					}
-					EstrucArbol += "label=\"" + Empresa->Activos->Nombre + " A:" + std::to_string(Empresa->Activos->Altura) + "\"];\n";
+					EstrucArbol += "label=\"" + Empresa->Activos->Nombre +"\",xlabel=\"" + std::to_string(Empresa->Activos->Altura) + "\"];\n";
 					NNodoARBOl++;
 					Arbol->EstructuraArbol(*Empresa->Activos, NP);
 				}
@@ -330,7 +332,7 @@ bool NodoMatriz::ReporteActivosEmpresa(std::string NombreEmpresa) {
 							else {
 								EstrucArbol += "[fillcolor=green ";
 							}
-							EstrucArbol += "label=\"" + Empresa->Activos->Nombre + " A:" + std::to_string(Empresa->Activos->Altura) + "\"];\n";
+							EstrucArbol += "label=\"" + Empresa->Activos->Nombre +"\",xlabel=\"" + std::to_string(Empresa->Activos->Altura) + "\"];\n";
 							NNodoARBOl++;
 							Arbol->EstructuraArbol(*Empresa->Activos, NP);
 						}
@@ -373,7 +375,7 @@ bool NodoMatriz::ReporteActivosDepartamento(std::string NombreDepartamento) {
 					else {
 						EstrucArbol += "[fillcolor=green ";
 					}
-					EstrucArbol += "label=\"" + Departamento->Activos->Nombre + " A:" + std::to_string(Departamento->Activos->Altura) + "\"];\n";
+					EstrucArbol += "label=\"" + Departamento->Activos->Nombre +"\",xlabel=\"" + std::to_string(Departamento->Activos->Altura) + "\"];\n";
 					NNodoARBOl++;
 					Arbol->EstructuraArbol(*Departamento->Activos, NP);
 				}
@@ -390,7 +392,7 @@ bool NodoMatriz::ReporteActivosDepartamento(std::string NombreDepartamento) {
 							else {
 								EstrucArbol += "[fillcolor=green ";
 							}
-							EstrucArbol += "label=\"" + Departamento->Activos->Nombre + " A:" + std::to_string(Departamento->Activos->Altura) + "\"];\n";
+							EstrucArbol += "label=\"" + Departamento->Activos->Nombre +"\",xlabel=\"" + std::to_string(Departamento->Activos->Altura) + "\"];\n";
 							NNodoARBOl++;
 							Arbol->EstructuraArbol(*Departamento->Activos, NP);
 						}
@@ -503,4 +505,33 @@ void NodoMatriz::RepMatriz() {
 	fs.close();
 	system("C:\\\"Program Files (x86)\"\\Graphviz2.38\\bin\\dot.exe -Tpng C:\\GraficasE\\MatrizUsuarios.dot -o C:\\GraficasE\\MatrizUsuarios.png");
 	system("C:\\GraficasE\\MatrizUsuarios.png &");
+}
+std::string NodoMatriz::ListarTodosLosActivos() {
+	std::string TodosLosActivos = "";
+	NAVL Activos = new NodoAVL();
+	NM Aux = InicioMatriz->Abajo;
+	while (Aux!=NULL){//while que recorre las empresa
+		NM CabEmpresa = Aux;//Guarda la cabecera de la empresa
+		Aux = Aux->Derecha;//Toma El primero usuario de la empresa en el departamento que este (el Departamento es indiferente)
+		while (Aux!=NULL) {//while que recorre los primeros usuarios en la empresa no importa el departamento
+			NM PrimerUser = Aux;//Guarda al primero usuario
+			if (Aux!=UserLog) {//Mira si es distinto al usuario logueado
+				TodosLosActivos += "-----USUARIO: " + Aux->Usuario + " DEPARTAMENTO: " + Aux->Departamento + " EMPRESA: " + Aux->Empresa + "-----\n";
+				TodosLosActivos += Activos->ListaActivo(*Aux->Activos,false);
+			}
+			if (Aux->Atras!=NULL) {//Verifica si hay mas usuario aparte del inicial
+				Aux = Aux->Atras;//toma al usuario de atras del primero
+				while (Aux!=NULL){//recorre los usuarios en el eje Z de la matriz
+					if (Aux!=UserLog) {//Mira si es distinto al usuario logueado
+						TodosLosActivos += Activos->ListaActivo(*Aux->Activos,false);
+					}
+					Aux = Aux->Atras;//toma al usuario de atras
+				}
+			}//fin IF
+			Aux = PrimerUser->Derecha;//toma el valor a la derecha del primer usuario
+		}
+		Aux = CabEmpresa->Abajo;//Toma la empresa de abajo
+	}//fin del whiile que recorre las empresa
+	delete Activos;
+	return TodosLosActivos;
 }

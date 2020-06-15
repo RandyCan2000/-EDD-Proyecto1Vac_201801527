@@ -30,7 +30,7 @@
     <ClCompile Include="NodoTransaccion.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="ID.cpp">
+    <ClCompile Include="NodoID.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,7 +47,7 @@
     <ClInclude Include="NodoTransaccion.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="ID.h">
+    <ClInclude Include="NodoID.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

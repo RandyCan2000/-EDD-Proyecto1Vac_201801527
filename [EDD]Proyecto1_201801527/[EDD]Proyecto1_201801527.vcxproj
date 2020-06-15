@@ -148,7 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Globales.cpp" />
-    <ClCompile Include="ID.cpp" />
+    <ClCompile Include="NodoID.cpp" />
     <ClCompile Include="NodoAVL.cpp" />
     <ClCompile Include="NodoMatriz.cpp" />
     <ClCompile Include="NodoTransaccion.cpp" />
@@ -156,7 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Globales.h" />
-    <ClInclude Include="ID.h" />
+    <ClInclude Include="NodoID.h" />
     <ClInclude Include="NodoAVL.h" />
     <ClInclude Include="NodoMatriz.h" />
     <ClInclude Include="NodoTransaccion.h" />
