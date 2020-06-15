@@ -6,6 +6,8 @@
 #include <fstream>
 
 std::string LSTUser="";
+std::string EstructuraUserGrafica = "";
+int ContadorNodoUsuario = 0;
 
 NodoMatriz::NodoMatriz(std::string Usuario, std::string Contrasena, std::string Departamento, std::string Empresa) {
 	this->Index = IndexUsuarios;
@@ -93,13 +95,17 @@ NM NodoMatriz::BuscarUsuario(std::string Usuario, std::string Departamento, std:
 							if (Usuario == Aux->Usuario) {
 								return Aux;
 							}
+							if (Aux == NULL) { return NULL; }
 							Aux = Aux->Atras;
+							if (Aux == NULL) { return NULL; }
 						}
 					}
+					if (Aux == NULL) { return NULL; }
 					Aux = Aux->Abajo;
 					if (Aux == NULL) { return NULL; }
 				}
 			}
+			if (Aux == NULL) { return NULL; }
 			Aux = Aux->Derecha;
 			if (Aux == NULL) { return NULL; }
 		}
@@ -413,7 +419,39 @@ bool NodoMatriz::ReporteActivosDepartamento(std::string NombreDepartamento) {
 	return true;
 }
 
+void EstructuraUsuariosEjeZ(NodoMatriz &Nodo) {
+	NM Aux = &Nodo;
+	int NumInicial = ContadorNodoUsuario;
+	EstructuraUserGrafica += "N"+std::to_string(ContadorNodoUsuario)+" [label=\""+Aux->Departamento+"\l"+Aux->Empresa+"\",fillcolor = slategrey];\n";
+	ContadorNodoUsuario++;
+	while (Aux!=NULL){
+		EstructuraUserGrafica += "N" + std::to_string(ContadorNodoUsuario) + " [label=\"" +Aux->Usuario+ "\",fillcolor=\"#967373\"];\n";
+		ContadorNodoUsuario++;
+		Aux = Aux->Atras;
+	}
+	for (int i = NumInicial; i < ContadorNodoUsuario; i++){
+		if (i==ContadorNodoUsuario-1) {
+			EstructuraUserGrafica += "N"+std::to_string(i)+" [dir=\"both\"];\n";
+		}
+		else {
+			EstructuraUserGrafica += "N" + std::to_string(i) + " -> ";
+		}
+	}
+}
+
+void GenerarReporte() {
+	std::ofstream fs("C:\\GraficasE\\UsuarioEjeZ.dot");
+	fs << "digraph G {" << std::endl;
+	fs << "node [margin=0, shape=box, style=filled];" << std::endl;
+	fs << EstructuraUserGrafica;
+	fs << "}" << std::endl;
+	fs.close();
+	system("C:\\\"Program Files (x86)\"\\Graphviz2.38\\bin\\dot.exe -Tpng C:\\GraficasE\\UsuarioEjeZ.dot -o C:\\GraficasE\\UsuarioEjeZ.png");
+	system("C:\\GraficasE\\UsuarioEjeZ.png &");
+}
+
 void NodoMatriz::RepMatriz() {
+	EstructuraUserGrafica = ""; ContadorNodoUsuario = 0;
 	NM Aux = InicioMatriz;
 	std::ofstream fs("C:\\GraficasE\\MatrizUsuarios.dot");
 	fs << "digraph G {" << std::endl;
@@ -465,6 +503,7 @@ void NodoMatriz::RepMatriz() {
 		while (Aux != NULL) {
 			fs << "USER" << Aux->Departamento << Aux->Empresa << " [label=\"" + Aux->Usuario + "\", width = 1.5,fillcolor=\"#967373\", group=" + std::to_string(Contador) + "];\n";
 			//Aqui Se crea el reporte si existen mas usuarios atras del principal
+			if (Aux->Atras != NULL) { EstructuraUsuariosEjeZ(*Aux); }
 			Aux = Aux->Abajo;
 		}
 		Aux = Cabecera->Derecha; Contador++;
@@ -505,6 +544,7 @@ void NodoMatriz::RepMatriz() {
 	fs.close();
 	system("C:\\\"Program Files (x86)\"\\Graphviz2.38\\bin\\dot.exe -Tpng C:\\GraficasE\\MatrizUsuarios.dot -o C:\\GraficasE\\MatrizUsuarios.png");
 	system("C:\\GraficasE\\MatrizUsuarios.png &");
+	if (EstructuraUserGrafica != "") { GenerarReporte(); }
 }
 std::string NodoMatriz::ListarTodosLosActivos() {
 	std::string TodosLosActivos = "";

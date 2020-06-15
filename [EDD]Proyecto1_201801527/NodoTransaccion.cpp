@@ -134,31 +134,22 @@ void NodoTransaccion::ReporteTransaccionesUnUsuario(NodoMatriz& User) {
 	int Contador = 0;
 	while (Aux != NULL) {
 		if (Aux->UserRentador== USER) {
-			fs << "R" << Contador << "[label=\"ID: " << Aux->ID << "\\n" << "RENTA: " << Aux->UserRenta->Usuario << "\\n" << "ACTIVO: " << Aux->Activo->Nombre << "\\n" << "RENTADOR: " << Aux->UserRentador->Usuario << "\"];\n";
+			fs << "R" << Contador << " [label=\"ID: " << Aux->ID << "\\n" << "RENTA: " << Aux->UserRenta->Usuario << "\\n" << "ACTIVO: " << Aux->Activo->Nombre << "\\n" << "RENTADOR: " << Aux->UserRentador->Usuario << "\"];\n";
 			Contador++;
 		}
 		Aux = Aux->Siguiente;
 		if (Aux == InicioTransacciones) { break; }
 	}
-	Contador = 0;
 	std::string Rank = "";
 	Aux = InicioTransacciones;
-	while (Aux != NULL) {
-		if (Aux->UserRentador==USER) {
-			if (Aux->Siguiente != InicioTransacciones) {
-				fs << "R" << Contador << " -> " << "R" << Contador + 1 << " [dir=\"both\"];\n";
-				Rank += "R" + std::to_string(Contador) + ";";
-			}
-			Contador++;
-		}
-		Aux = Aux->Siguiente;
-		if (Aux == InicioTransacciones) {
-			Rank += "R" + std::to_string(Contador - 1) + ";";
-			fs << "R" << Contador - 1 << " -> " << "R0" << " [dir=\"both\"];\n";
-			break;
-		}
+	for (int i = 0; i < Contador; i++){
+		fs << "R"<<std::to_string(i)<<" -> ";
+		Rank += "R" + std::to_string(i) + ";";
 	}
-	fs << "{" << " rank = same ; " << Rank << "}";
+	if (Contador>0) {
+		fs << "R0 [dir=\"both\"]; \n";
+		fs << "{" << " rank = same ; " << Rank << "}\n";
+	}
 	fs << "}" << std::endl;
 	fs.close();
 	system("C:\\\"Program Files (x86)\"\\Graphviz2.38\\bin\\dot.exe -Tpng C:\\GraficasE\\TransaccionesUnUsuario.dot -o C:\\GraficasE\\TransaccionesUnUsuario.png");
